@@ -55,6 +55,9 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         double vw = v + 16F / 256F; //v + uvd;
 
         float pixels = Math.round(fullness * 11);
+        if (pixels < 1) {
+            return;
+        }
         float h = 1F / 16F + pixels / 16F;
         v += (4 + 11 - pixels) / 256F;
         final double d = 1.0 / 128.0;
