@@ -116,6 +116,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         topStack = bottomStack = null;
         updateStacks();
         broadcastItemCount();
+        onInventoryChanged();
     }
 
     public void setItemCount(int val) {
@@ -184,6 +185,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         ItemStack ret = is.splitStack(amount);
         updateStacks();
         broadcastItemCount();
+        onInventoryChanged();
         return ret;
     }
 
@@ -208,6 +210,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             broadcastItem();
         }
         broadcastItemCount();
+        onInventoryChanged();
     }
 
     @Override
@@ -257,6 +260,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         item = is.copy();
         broadcastItem();
+        onInventoryChanged();
     }
 
     void broadcastItem() {
@@ -516,6 +520,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         updateStacks();
         if (lastCount != getItemCount()) {
             broadcastItemCount();
+            onInventoryChanged();
         }
     }
 

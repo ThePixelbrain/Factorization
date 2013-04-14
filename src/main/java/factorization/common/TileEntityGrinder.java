@@ -43,6 +43,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (slot == 1) {
             output = is;
         }
+        onInventoryChanged();
     }
 
     @Override

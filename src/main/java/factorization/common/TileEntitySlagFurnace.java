@@ -36,6 +36,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public void setInventorySlotContents(int i, ItemStack is) {
         furnaceItemStacks[i] = is;
+        onInventoryChanged();
     }
 
     @Override

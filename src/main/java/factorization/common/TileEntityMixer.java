@@ -82,6 +82,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         }
         dirty = true;
         cache = null;
+        onInventoryChanged();
     }
     
     @Override
