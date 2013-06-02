@@ -69,7 +69,9 @@ public class Coord {
 
     public String toString() {
         String ret = "(" + x + ", " + y + ", " + z + ")";
-        if (!blockExists()) {
+        if (w == null) {
+            ret += " null world";
+        } else if (!blockExists()) {
             ret += " not loaded";
         } else if (w != null) {
             ret += " a " + getBlock();
