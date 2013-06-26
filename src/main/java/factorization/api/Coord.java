@@ -589,8 +589,10 @@ public class Coord {
         return !w.isRemote;
     }
     
-    public void spawnItem(ItemStack is) {
-        w.spawnEntityInWorld(new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is));
+    public EntityItem spawnItem(ItemStack is) {
+        EntityItem ent = new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is);
+        w.spawnEntityInWorld(ent);
+        return ent;
     }
     
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
