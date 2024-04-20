@@ -211,7 +211,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public final void onInventoryChanged() {
+    public void onInventoryChanged() {
         super.onInventoryChanged();
         needLogic();
     }

@@ -73,16 +73,17 @@ public class TileEntityMixer extends TileEntityFactorization implements
             }
         }
         
-        setDirty();
+        onInventoryChanged();
     }
-    
-    void setDirty() {
+
+    @Override
+    public void onInventoryChanged() {
+        super.onInventoryChanged();
         if (worldObj != null && worldObj.isRemote) {
             return;
         }
         dirty = true;
         cache = null;
-        onInventoryChanged();
     }
     
     @Override
@@ -92,7 +93,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : outputBuffer) {
             FactorizationUtil.spawnItemStack(here, is);
         }
-        setDirty();
+        onInventoryChanged();
     }
 
     @Override
@@ -102,7 +103,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        //setDirty();
         if (slot >= 0 && slot < 4) {
             return input[slot];
         }
@@ -115,7 +115,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
-        setDirty();
         if (slot >= 0 && slot < 4) {
             input[slot] = is;
             return;
@@ -472,7 +471,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         outputBuffer.add(out);
         FactorizationUtil.addInventoryToArray(craft, outputBuffer);
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
-        setDirty();
+        onInventoryChanged();
     }
     
     boolean drainBuffer() {
@@ -528,6 +527,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress += speed;
         if (getRemainingProgress() <= 0 || Core.cheat) {
             progress = 0;
+            if (!recipeMatches(mr.inputs)) {
+                onInventoryChanged();
+                dirty = true;
+                return;
+            }
             craftRecipe(mr);
             normalize(input);
             while (drainBuffer()) ;
