@@ -17,6 +17,9 @@ compileJava.options.release.set(6) //Forge doesn't understand classes compiled t
 String minecraftVersion = "1.4.7"
 String forgeVersion = "1.4.7-6.6.2.534"
 
+archivesBaseName = "Factorization"
+version = "0.7.21.1"
+
 repositories {
 	ivy {
 		name 'asie dependency mirror'
@@ -24,6 +27,13 @@ repositories {
 		metadataSources {
 			artifact()
 		}
+	}
+}
+
+sourceSets {
+	main {
+		java.srcDirs = ["src/main/java"]
+		resources.srcDirs = ["src/main/resources", "docs"]
 	}
 }
 
