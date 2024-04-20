@@ -79,21 +79,38 @@ public class ItemPocketTable extends Item {
 
     public ItemStack findPocket(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (i % 9 >= (9 - 3) && i > 9) {
-                continue;
-            }
-            ItemStack is = inv.getStackInSlot(i);
+        int need_to_move = -1;
+        int a_free_space = -1;
+        for (int i = 0; i < inv.mainInventory.length; i++) {
+            boolean in_crafting_area = i % 9 >= (9 - 3) && i > 9;
+            ItemStack is = inv.mainInventory[i]; // A little bit gross; using it the proper causes us to check armor slots.
             if (is == null) {
+                if (!in_crafting_area) {
+                    if (a_free_space == -1 || a_free_space < 9) {
+                        // Silly condition because: If it's not set, we should set it. If it's < 9, it's in the hotbar, which is a poor choice.
+                        // If it is going to the hotbar, it'll end up in the last empty slot.
+                        a_free_space = i;
+                    }
+                }
                 continue;
             }
             if (is.getItem() == this) {
-                return is;
+                if (in_crafting_area) {
+                    need_to_move = i;
+                } else {
+                    return is;
+                }
             }
         }
         ItemStack mouse_item = player.inventory.getItemStack();
         if (mouse_item != null && mouse_item.getItem() == this && player.openContainer instanceof ContainerPocket) {
             return mouse_item;
+        }
+        if (need_to_move != -1 && a_free_space != -1) {
+            ItemStack pocket = inv.getStackInSlot(need_to_move);
+            inv.setInventorySlotContents(need_to_move, null);
+            inv.setInventorySlotContents(a_free_space, pocket);
+            return pocket;
         }
         return null;
     }
