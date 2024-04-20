@@ -117,7 +117,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     private IInventory openInventory(TileEntity ent) {
         if (ent instanceof TileEntityChest) {
-            IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
+            IInventory chest = InvUtil.openDoubleChest((TileEntityChest) ent, false);
             // null means it's a lower chest, but would keep it from
             // continuing, so return a convenient Router.
             return (chest == null) ? this : chest;
@@ -498,7 +498,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         int start, end;
         if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0 && target_slot < 0) {
-            t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
+            t = new InvUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
         }
         if (target_slot < 0) {
             start = 0;

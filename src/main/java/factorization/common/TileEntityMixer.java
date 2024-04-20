@@ -2,10 +2,7 @@ package factorization.common;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -136,12 +133,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (side == ForgeDirection.UP) {
             return 0;
         }
-        return 4;
+        return input.length;
     }
 
     @Override
     public int getSizeInventorySide(ForgeDirection side) {
-        return 4;
+        return side == ForgeDirection.UP ? input.length : output.length;
     }
 
     @Override
@@ -496,23 +493,58 @@ public class TileEntityMixer extends TileEntityFactorization implements
         int i = Math.max(2, speed);
         return charge.tryTake(i) > 0;
     }
-    
+
+    int add(InventoryCrafting craft, int craft_slot, ItemStack is) {
+        if (is == null) {
+            return craft_slot;
+        }
+        if (is.stackSize > is.getMaxStackSize() || is.stackSize < 1) {
+            Core.logWarning("%s: Trying to craft with %s, which has a stack size of %s", getCoord(), is, is.stackSize);
+            craft.setInventorySlotContents(craft_slot++, is);
+            return craft_slot;
+        }
+        while (is.stackSize > 0) {
+            craft.setInventorySlotContents(craft_slot++, is.splitStack(1));
+        }
+        return craft_slot;
+    }
+
     void craftRecipe(RecipeMatchInfo mr) {
         InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
         int craft_slot = 0;
-        outer: for (int count = 0; count < mr.inputs.size(); count++) {
-            Object o = mr.inputs.get(count);
-            for (int i = 0; i < input.length; i++) {
-                int size = 1;
-                if (o instanceof ItemStack) {
-                    size = ((ItemStack) o).stackSize;
+        InvUtil.FzInv inv = InvUtil.openInventory(this, ForgeDirection.UP);
+        ArrayList recipeInputs = new ArrayList();
+        for (Object o : mr.inputs) {
+            if (o instanceof ItemStack) {
+                recipeInputs.add(((ItemStack) o).copy());
+            } else {
+                ArrayList<ItemStack> cp = new ArrayList();
+                for (ItemStack is : (Iterable<ItemStack>) o) {
+                    cp.add(is.copy());
                 }
-                for (int c = 0; c < size; c++) {
-                    craft.setInventorySlotContents(craft_slot++, input[i].splitStack(1));
-                }
-                if (FactorizationUtil.oreDictionarySimilar(o, input[i])) {
-                    craft.setInventorySlotContents(count, input[i].splitStack(1));
-                    continue outer;
+                recipeInputs.add(cp);
+            }
+        }
+        for (int i_input = 0; i_input < recipeInputs.size(); i_input++) {
+            Object o = recipeInputs.get(i_input);
+            if (o instanceof ItemStack) {
+                ItemStack is = (ItemStack) o;
+                craft_slot = add(craft, craft_slot, inv.pull(is, is.stackSize, false));
+                is.stackSize = 0;
+            } else {
+                for (ItemStack is : ((Iterable<ItemStack>) o)) {
+                    ItemStack got = FactorizationUtil.normalize(inv.pull(is, 1, false));
+                    if (got != null) {
+                        for (Iterator<ItemStack> iterator = ((Iterable<ItemStack>) o).iterator(); iterator.hasNext();) {
+                            ItemStack others = iterator.next();
+                            if (others != is) {
+                                iterator.remove();
+                            }
+                        }
+                        is.stackSize--;
+                        craft_slot = add(craft, craft_slot, got);
+                        break;
+                    }
                 }
             }
         }
@@ -534,26 +566,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     boolean drainBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            for (int i = 0; i < output.length; i++) {
-                if (output[i] == null) {
-                    output[i] = outputBuffer.remove(0);
-                    if (outputBuffer.size() == 0) {
-                        return false;
-                    }
-                }
-            }
-            for (int i = 0; i < output.length; i++) {
-                int free = output[i].getMaxStackSize() - output[i].stackSize;
-                if (FactorizationUtil.similar(output[i], toAdd) && free > 0) {
-                    int toTake = Math.min(free, toAdd.stackSize);
-                    toAdd.stackSize -= toTake;
-                    output[i].stackSize += toTake;
-                    if (toAdd.stackSize <= 0) {
-                        outputBuffer.remove(0);
-                        if (outputBuffer.size() == 0) {
-                            return false;
-                        }
-                    }
+            InvUtil.FzInv out = InvUtil.openInventory(this, ForgeDirection.DOWN);
+            out.setInsertForce(true);
+            Iterator<ItemStack> it = outputBuffer.iterator();
+            while (it.hasNext()) {
+                if (out.push(it.next()) == null) {
+                    it.remove();
                 }
             }
         }

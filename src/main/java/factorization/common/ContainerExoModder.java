@@ -336,7 +336,7 @@ public class ContainerExoModder extends Container {
                     return null;
                 }
             }
-            return FactorizationUtil.transferSlotToSlots(clickedSlot, targetSlots);
+            return InvUtil.transferSlotToSlots(player, clickedSlot, targetSlots);
         } finally {
             armorSlot.unpackArmor();
         }
