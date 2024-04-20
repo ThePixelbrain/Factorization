@@ -38,7 +38,22 @@ public class GuiPocketTable extends GuiContainer {
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
         this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
-        this.fontRenderer.drawString("Keys: " + Core.pocketActions, 178, 51, 4210752);
+        int color = 0xa0a0a0;
+        for (int i = 0; i < Core.pocketActions.length(); i++) {
+            char key = Core.pocketActions.charAt(i);
+            String msg = null;
+            switch (i) {
+                case 0: msg = "Empty the crafting grid"; break;
+                case 1: msg = "Slide stacks ↷, alternating"; break;
+                case 2: msg = "Balance items"; break;
+            }
+            if (msg == null) {
+                continue;
+            }
+            int d = 10;
+            int y = -d*Core.pocketActions.length() + d*i;
+            this.fontRenderer.drawString(key + ": " + msg, 8, y, color);
+        }
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
         // we can fit only that much
         // also maybe draw a nice reference for keys to press for below
