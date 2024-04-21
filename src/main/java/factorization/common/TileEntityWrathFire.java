@@ -159,6 +159,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     BlockMatch host = null;
     int age = 0, generation = 0;
+    int wrathConversions = 0;
 
     int random_time_offset = rand.nextInt();
 
@@ -171,6 +172,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         tag.setInteger("host_id", host.id);
         tag.setInteger("host_md", host.md);
         tag.setInteger("age", age);
+        tag.setInteger("wrathConversions", wrathConversions);
         tag.setInteger("generation", generation);
     }
 
@@ -179,6 +181,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         super.readFromNBT(tag);
         host = new BlockMatch(tag.getInteger("host_id"), tag.getInteger("host_md"));
         age = tag.getInteger("age");
+        wrathConversions = tag.getInteger("wrathConversions");
         generation = tag.getInteger("generation");
     }
 
@@ -276,7 +279,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         if (rand.nextFloat() > .95) {
             return;
         }
-        if (age > max_age) {
+        if (age > max_age || (Core.wrath_forge_conversions > -1 && wrathConversions >= Core.wrath_forge_conversions)) {
             die();
             return;
         }
@@ -325,7 +328,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                             continue; //don't burn something that we're just going to reverse
                         }
                         burnsTo.set(c);
-                        age++;
+                        wrathConversions++;
                         return;
                     }
                 }

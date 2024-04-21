@@ -100,6 +100,7 @@ public class Core {
     public static boolean enable_sketchy_client_commands = true;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
+    public static int wrath_forge_conversions = 36;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -210,6 +211,7 @@ public class Core {
         serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
+        wrath_forge_conversions = getIntConfig("wrathForgeConversions", "server", wrath_forge_conversions, "Amount of conversions with one fire inside the wrath forge (Set to -1 for infinite).");
 
         config.save();
     }
